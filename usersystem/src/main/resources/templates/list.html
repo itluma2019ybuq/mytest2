@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>用户中心</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <script src="/layui/layui.js"></script>
+    <style type="text/css">
+        table{
+            border:1px solid #999999;
+            width:900px;
+        }
+        table td{
+            padding:5px;
+        }
+        </style>
+</head>
+
+<body>
+<h1>用户中心</h1>
+<hr/>
+<a href="/user/add">添加新用户</a>
+<table border="1">
+    <thead>
+    <tr>
+        <th>编号</th>
+        <th>姓名</th>
+        <th>性别</th>
+        <th>生日</th>
+        <th>部门</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="u : ${pages.datas}">
+        <td th:text="${u.id}"></td>
+        <td th:text="${u.name}">Lorem</td>
+        <td th:text="${u.sex} == 1 ? '男' : '女'">sit</td>
+        <td th:text="${#dates.format(u.birthday, 'yyyy-MM-dd')}">sit</td>
+        <td th:text="${u.depName}">sit</td>
+        <td><a th:href="@{/user/edit(id=${u.id})}">编辑</a>&nbsp;|&nbsp;
+            <a th:onclick="deleteById([[${u.id}]])">删除</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div id="demo0"></div>
+<form id="delete_form" action="/user/delete" method="post">
+    <input type="hidden" name="_method" value="delete">
+    <input type="hidden" name="id" id="id">
+</form>
+</body>
+<script type="text/javascript" th:inline="javascript">
+    curr = /*[[${pages.currentPage}]]*/ 0;
+
+    function deleteById(id) {
+        var b = window.confirm("你确定删除吗？");
+        var input = document.getElementById("id");
+        if (b) {
+            input.value = id;
+            document.getElementById("delete_form").submit();
+        }
+    }
+
+    layui.use(['laypage', 'layer'], function () {
+            var laypage = layui.laypage, layer = layui.layer;
+            //分页
+            laypage.render({
+                elem: 'demo0', //分页容器的id
+                pages:  /*[[${pages.totalPage}]]*/ 0,//总页数
+                count: /*[[${pages.totalNum}]]*/ 0,   //总记录数
+                limit: /*[[${pages.size}]]*/ 5,//每一页大小
+                skin: '#1E9FFF', //自定义选中色值
+                skip: true, //开启跳页
+                curr: curr,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var keyword = /*[[${keyword}]]*/ '';
+                        location.href = "http://localhost:8080/user/list?page=" + obj.curr + "&keyword=" + keyword;
+                    }
+                }
+            });
+        }
+    )
+</script>
+
+</html>
